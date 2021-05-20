@@ -23,21 +23,26 @@ it('correct env', () => {
   expect(process.env.DB_ENV).toBe('testing');
 });
 
-describe('Flowers model', () => {
-  describe('creates flower', () => {
-    it('add a flower to the database', async () => {
-      let list;
-      await Flower.create(snapdragon);
-      all = await db('flowers');
-      expect(all).toHaveLength(1);
+describe('[GET] /flowers', () => {
+  it('responds with a 200 ok', async () => {
+    const res = await request(server).get('/flowers');
+    expect(res.status).toBe(200);
+  });
+});
 
-      await Flower.create(poppy);
-      all = await db('flowers');
-      expect(all).toHaveLength(2);
-    });
-    it('inserted flower', async () => {
-      const flower = await Flower.create(snapdragon);
-      expect(flower).toMatchObject({ id: 1, ...snapdragon });
-    });
+describe('[DELETE] /delete flower', () => {
+  it('deletes flower from database', async () => {
+    const [id] = await db('flowers').insert(iris);
+    let removed = await db('flowers').where({ id }).first();
+    expect(removed).toBeTruthy();
+
+    await request(server).delete('/flowers/' + id);
+    removed = await db('flowers').where({ id }).first();
+    expect(removed).toBeFalsy();
+  });
+  it('responds with the deleted flower', async () => {
+    const res = await db('flowers').insert(iris);
+    let flower = await request(server).delete('/flowers/1');
+    expect(flower.body).toMatchObject(iris);
   });
 });
