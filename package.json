@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "Node Server Testing Challenge",
   "scripts": {
-    "test": "jest --watch"
+    "test": "cross-env DB_ENV=testing jest --watchALL --verbose --runInBand",
+    "start": "node index.js",
+    "server": "nodemon index.js",
+    "migrate": "knex migrate:latest",
+    "seed": "knex seed:run"
   },
   "jest": {
     "testEnvironment": "node"
